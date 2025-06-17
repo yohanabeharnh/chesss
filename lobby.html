@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Chess Lobby</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4CAF50; /* Green */
+            --primary-dark: #388E3C; /* Darker green */
+            --primary-light: #81C784; /* Light green */
+            --accent-color: #121212; /* Dark background */
+            --card-bg: #1E1E1E; /* Dark card background */
+            --text-color: #E0E0E0; /* Light text */
+            --text-light: #9E9E9E; /* Lighter text */
+            --btn-hover: #2E7D32;
+            --highlight-color: #2D2D2D; /* Darker accent */
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            --shadow-hover: 0 6px 16px rgba(0, 0, 0, 0.4);
+            --border-radius: 12px;
+            --border-radius-sm: 8px;
+            --danger-color: #F44336;
+            --success-color: #4CAF50;
+            --warning-color: #FF9800;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--accent-color);
+            color: var(--text-color);
+            padding: 8px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 100%;
+            margin: 0 auto;
+        }
+
+        header {
+            padding: 12px 0;
+            margin-bottom: 12px;
+            position: sticky;
+            top: 0;
+            background-color: var(--card-bg);
+            z-index: 10;
+            box-shadow: var(--shadow);
+            border-radius: var(--border-radius);
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            padding: 0 12px;
+            justify-content: space-between;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        #user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        #username {
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        #balance-amount {
+            font-size: 0.85rem;
+            color: var(--primary-light);
+            margin-top: 2px;
+        }
+
+        #back-btn {
+            background: none;
+            border: none;
+            color: var(--text-color);
+            cursor: pointer;
+            margin-right: 12px;
+            padding: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.2s;
+        }
+
+        #back-btn:active {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        h1 {
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        section {
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            margin-bottom: 16px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .section-header {
+            background-color: var(--highlight-color);
+            padding: 14px 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        h2 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-color);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .material-icons {
+            font-size: 20px;
+            color: var(--primary-color);
+        }
+
+        .section-content {
+            padding: 16px;
+        }
+
+        .bet-buttons {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .bet-button {
+            background-color: var(--highlight-color);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--border-radius-sm);
+            padding: 12px 8px;
+            text-align: center;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--text-color);
+        }
+
+        .bet-button:active {
+            background-color: rgba(255, 255, 255, 0.1);
+            transform: translateY(2px);
+        }
+
+        .bet-button.active {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .bet-button.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .bet-amount {
+            font-size: 0.95rem;
+            font-weight: 600;
+        }
+
+        .bet-label {
+            font-size: 0.75rem;
+            opacity: 0.8;
+            margin-top: 2px;
+        }
+
+        .private-toggle-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 16px 0;
+            padding: 12px 16px;
+            background-color: var(--highlight-color);
+            border-radius: var(--border-radius-sm);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .private-toggle-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            color: var(--text-color);
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #555;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: var(--primary-color);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        .create-game-btn {
+            width: 100%;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius-sm);
+            padding: 14px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: var(--shadow);
+        }
+
+        .create-game-btn:active {
+            background-color: var(--primary-dark);
+            transform: translateY(2px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .status-message {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            margin-top: 12px;
+            text-align: center;
+        }
+
+        .status-message.error {
+            color: var(--danger-color);
+        }
+
+        .status-message.success {
+            color: var(--success-color);
+        }
+
+        .games-list {
+            list-style: none;
+        }
+
+        .game-item {
+            background-color: var(--highlight-color);
+            border-radius: var(--border-radius-sm);
+            padding: 14px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--shadow);
+            transition: all 0.2s;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .game-item:active {
+            background-color: rgba(255, 255, 255, 0.05);
+            transform: translateY(2px);
+        }
+
+        .game-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .game-creator {
+            font-weight: 500;
+            margin-bottom: 6px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--text-color);
+        }
+
+        .creator-avatar {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        .game-details {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            font-size: 0.8rem;
+            color: var(--text-light);
+            margin-top: 8px;
+        }
+
+        .game-detail {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            background-color: rgba(0, 0, 0, 0.2);
+            padding: 4px 8px;
+            border-radius: 12px;
+        }
+
+        .game-code {
+            background-color: rgba(76, 175, 80, 0.2);
+            color: var(--primary-light);
+            font-weight: 500;
+        }
+
+        .join-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius-sm);
+            padding: 10px 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            flex-shrink: 0;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .join-btn:active {
+            background-color: var(--primary-dark);
+            transform: translateY(2px);
+        }
+
+        .no-games {
+            text-align: center;
+            color: var(--text-light);
+            padding: 24px 16px;
+            font-size: 0.9rem;
+            background-color: var(--highlight-color);
+            border-radius: var(--border-radius-sm);
+            margin-top: 8px;
+            border: 1px dashed rgba(255, 255, 255, 0.1);
+        }
+
+        .refresh-btn {
+            background: none;
+            border: none;
+            color: var(--primary-color);
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px;
+            border-radius: var(--border-radius-sm);
+            transition: all 0.2s;
+        }
+
+        .refresh-btn:active {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .badge {
+            background-color: var(--primary-color);
+            color: white;
+            font-size: 0.7rem;
+            padding: 2px 6px;
+            border-radius: 10px;
+            margin-left: 6px;
+        }
+
+        .join-private-form {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .private-game-input {
+            flex: 1;
+            padding: 12px 14px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--border-radius-sm);
+            font-size: 0.9rem;
+            background-color: var(--highlight-color);
+            color: var(--text-color);
+            transition: all 0.2s;
+        }
+
+        .private-game-input::placeholder {
+            color: var(--text-light);
+            opacity: 0.7;
+        }
+
+        .private-game-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+        }
+
+        .join-private-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius-sm);
+            padding: 0 14px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            flex-shrink: 0;
+        }
+
+        .join-private-btn:active {
+            background-color: var(--primary-dark);
+            transform: translateY(2px);
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        .time-ago {
+            font-size: 0.75rem;
+            color: var(--text-light);
+        }
+
+        .user-display {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <button id="back-btn" class="icon-btn" title="Go back">
+                    <span class="material-icons">arrow_back</span>
+                </button>
+                <h1>Chess Lobby</h1>
+                <div class="user-info">
+                    <div id="user-avatar">U</div>
+                    <div class="user-display">
+                        <div id="username">Guest</div>
+                        <div id="balance-amount">0 ETB</div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <section id="create-game-section">
+            <div class="section-header">
+                <h2>
+                    <span class="material-icons">add</span>
+                    Create New Game
+                </h2>
+            </div>
+            <div class="section-content">
+                <div class="bet-buttons" id="create-bet-buttons">
+                    <!-- Bet buttons will be generated by JavaScript -->
+                </div>
+                <div class="private-toggle-container">
+                    <div class="private-toggle-label">
+                        <span class="material-icons">lock</span>
+                        Private Game
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="private-game-toggle">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <button class="create-game-btn" id="create-game-btn">
+                    <span class="material-icons">add</span>
+                    Create Game
+                </button>
+                <p id="create-game-status" class="status-message"></p>
+            </div>
+        </section>
+
+        <section id="available-games-section">
+            <div class="section-header">
+                <h2>
+                    <span class="material-icons">people</span>
+                    Available Games
+                    <span class="badge" id="games-count">0</span>
+                </h2>
+                <button class="refresh-btn" id="refresh-games-btn">
+                    <span class="material-icons">refresh</span>
+                    Refresh
+                </button>
+            </div>
+            <div class="section-content">
+                <ul class="games-list" id="available-games-list">
+                    <li class="no-games">No games available yet. Create one!</li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="join-private-section">
+            <div class="section-header">
+                <h2>
+                    <span class="material-icons">vpn_key</span>
+                    Join Private Game
+                </h2>
+            </div>
+            <div class="section-content">
+                <div class="join-private-form">
+                    <input type="text" id="private-game-code" placeholder="Enter game code" class="private-game-input">
+                    <button class="join-private-btn" id="join-private-btn">
+                        <span class="material-icons">login</span>
+                        Join
+                    </button>
+                </div>
+                <p id="join-private-status" class="status-message"></p>
+            </div>
+        </section>
+    </div>
+
+    <script type="module" src="lobby.js"></script>
+</body>
+</html>
