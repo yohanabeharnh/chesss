@@ -1621,7 +1621,7 @@ app.post('/api/accept-draw', async (req, res) => {
 
 
 
-const BASE_URL = 'http://localhost:3001'; // Mock server URL
+const BASE_URL = 'https://bot-cjuh.onrender.com'; // Mock server URL
 const AUTH_TOKEN = 'mocktoken'; // Mock authentication token
 
 class GameWallet {
