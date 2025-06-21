@@ -14,11 +14,15 @@ const supabase = createClient(
 
 // Admin authentication middleware
 const authenticateAdmin = (req, res, next) => {
-  const authToken = req.headers['admin-token'];
+  // Check both header formats
+  const authToken = req.headers['admin-token'] || 
+                   (req.headers['authorization'] && req.headers['authorization'].replace('Bearer ', ''));
+  
   if (authToken === 'f9b1c74d59e543eabc76f74f9de3a3b85a0c1b740b5117d2b5760c7b47e9e812') {
     next();
   } else {
-    res.status(401).json({ error: 'Unauthorized' });
+    console.log('Received headers:', req.headers); // Debug logging
+    res.status(401).json({ error: 'Unauthorizeddddd' });
   }
 };
 
