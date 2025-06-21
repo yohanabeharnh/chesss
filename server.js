@@ -295,7 +295,98 @@ app.get('/admin/abandoned-games', authenticateAdmin, async (req, res) => {
     res.status(500).json({ error: 'Failed to fetch abandoned games' });
   }
 });
+// Search by game code
+app.get('/admin/search/game/:code', authenticateAdmin, async (req, res) => {
+  try {
+    const { code } = req.params;
+    
+    const { data: game, error } = await supabase
+      .from('chess_games')
+      .select(`
+        code,
+        status,
+        bet,
+        turn,
+        white_username,
+        black_username,
+        created_at,
+        updated_at,
+        fen,
+        winner,
+        result
+      `)
+      .eq('code', code)
+      .single();
 
+    if (error) throw error;
+    if (!game) return res.status(404).json({ error: 'Game not found' });
+
+    res.json({
+      gameCode: game.code,
+      status: game.status,
+      betAmount: game.bet,
+      currentTurn: game.turn,
+      whitePlayer: game.white_username,
+      blackPlayer: game.black_username,
+      createdAt: game.created_at,
+      lastUpdated: game.updated_at,
+      currentPosition: game.fen,
+      winner: game.winner,
+      result: game.result
+    });
+  } catch (err) {
+    console.error('Error searching game:', err);
+    res.status(500).json({ error: 'Failed to search game' });
+  }
+});
+
+// Search by player username
+app.get('/admin/search/player/:username', authenticateAdmin, async (req, res) => {
+  try {
+    const { username } = req.params;
+    
+    const { data: games, error } = await supabase
+      .from('chess_games')
+      .select(`
+        code,
+        status,
+        bet,
+        turn,
+        white_username,
+        black_username,
+        created_at,
+        updated_at,
+        winner,
+        result
+      `)
+      .or(`white_username.eq.${username},black_username.eq.${username}`)
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+
+    const formattedGames = games.map(game => ({
+      gameCode: game.code,
+      status: game.status,
+      betAmount: game.bet,
+      currentTurn: game.turn,
+      playerRole: game.white_username === username ? 'white' : 'black',
+      opponent: game.white_username === username ? game.black_username : game.white_username,
+      createdAt: game.created_at,
+      lastUpdated: game.updated_at,
+      winner: game.winner,
+      result: game.result
+    }));
+
+    res.json({
+      username,
+      totalGames: games.length,
+      games: formattedGames
+    });
+  } catch (err) {
+    console.error('Error searching player:', err);
+    res.status(500).json({ error: 'Failed to search player' });
+  }
+});
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
   console.log(`Admin server running on port ${PORT}`);
