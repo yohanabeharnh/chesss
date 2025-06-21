@@ -15,7 +15,7 @@ const supabase = createClient(
 // Admin authentication middleware
 const authenticateAdmin = (req, res, next) => {
   const authToken = req.headers['admin-token'];
-  if (authToken === process.env.ADMIN_TOKEN || authToken === f9b1c74d59e543eabc76f74f9de3a3b85a0c1b740b5117d2b5760c7b47e9e812) {
+  if (authToken === 'f9b1c74d59e543eabc76f74f9de3a3b85a0c1b740b5117d2b5760c7b47e9e812') {
     next();
   } else {
     res.status(401).json({ error: 'Unauthorized' });
@@ -126,7 +126,7 @@ app.get('/admin/stats/week', authenticateAdmin, async (req, res) => {
 });
 
 // Last N days stats endpoint
-app.get('/admin/stats/last/today', authenticateAdmin, async (req, res) => {
+app.get('/admin/stats/last/:days', authenticateAdmin, async (req, res) => {
   try {
     const days = parseInt(req.params.days);
     if (isNaN(days) || days < 1) {
